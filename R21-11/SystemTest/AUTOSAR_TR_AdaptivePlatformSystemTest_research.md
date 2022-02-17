@@ -34,4 +34,7 @@ Communication Managementテスト（[CMテスター]）でジョブを実行し�
 |  Trace to RS Criteria  |  [RS_CM_00101], [RS_CM_00102], [RS_CM_00104], [RS_CM_00105], [RS_CM_00106], [RS_CM_00201], [RS_CM_00202], [RS_CM_00206]  |
 |  Reference to Test Environment  |  STC_CM_00002    |
 |  Configuration Parameters  |  - 既存の通信サービスは次のもので構成されます（サービス名は任意です）。<br> - [CMService08]: Offered by [CMApp04], requested by [CMApp05].<br> - Service [CMService08] is an attribute of Events.<br> - Reception of services from Server to Proxy is possible using pooling-based style.  |
-  
+|  Summary  |  最初に[CMテスター]が[ECU1]と[ECU2]のアプリケーションにMachine StateをDrivingに遷移する要求を出します。<br>[CMテスター] [ECU1]と[ECU2]で拡張診断セッションを要求します。<br>[CMテスター]はアプリケーション[CMApp04] [ECU2]のサービス[CMService08]の提供をトリガーし、次にアプリケーション[CMApp04] [ECU2]または[ECU1]がサービス[CMService08]の提供を開始します。<br> [CMService08]は[ECU1]の[CMApp05]にSubscribeされます。<br>アプリケーション[CMApp05] [ECU1]キューはイベントを受信しました。<n>はキューの長さです。|
+
+> diagnostic sessionって？
+> 
