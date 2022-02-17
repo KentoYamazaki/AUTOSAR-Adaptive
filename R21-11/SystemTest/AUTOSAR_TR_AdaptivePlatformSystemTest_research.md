@@ -2,13 +2,13 @@
 ## 4 Test configuration and test steps for Communication Management
 ### 4.1 Test System
 #### 4.1.1 Test configurations Communication Management
+|  |  |
+| ---- | ---- |
 |  ConfigurationID  |  STC_CM_00001  |
 |  Description  |  Standard Jenkins server for Communication Management test  |
 |  ECU1  |  Hardware, 192.168.100.5  |
 |  ECU2  |  Hardware, 192.168.100.2  |
 |  Jenkins  |  Jenkins Server, 192.168.100.10  |
-| ---- | ---- |
-
 #### 4.2.3 [STS_CM_00003] Communication for Events based on polling-based style.
 * Test Objective  
 アプリケーションがサービスの提供、サブスクライブ、受信、およびサブスクライブの停止を実行できること、および通信がイベントの1対nの通信トポロジで機能することを確認します。アプリケーションは、イベントを受信し、ポーリングベースのスタイルでそれらにアクセスできます。  
