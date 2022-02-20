@@ -34,7 +34,14 @@ Communication Managementテスト（[CMテスター]）でジョブを実行し�
 |  Trace to RS Criteria  |  [RS_CM_00101], [RS_CM_00102], [RS_CM_00104], [RS_CM_00105], [RS_CM_00106], [RS_CM_00201], [RS_CM_00202], [RS_CM_00206]  |
 |  Reference to Test Environment  |  STC_CM_00002    |
 |  Configuration Parameters  |  - 既存の通信サービスは次のもので構成されます（サービス名は任意です）。<br> - [CMService08]: Offered by [CMApp04], requested by [CMApp05].<br> - Service [CMService08] is an attribute of Events.<br> - Reception of services from Server to Proxy is possible using pooling-based style.  |
-|  Summary  |  最初に[CMテスター]が[ECU1]と[ECU2]のアプリケーションにMachine StateをDrivingに遷移する要求を出します。<br>[CMテスター] [ECU1]と[ECU2]で拡張診断セッションを要求します。<br>[CMテスター]はアプリケーション[CMApp04] [ECU2]のサービス[CMService08]の提供をトリガーし、次にアプリケーション[CMApp04] [ECU2]または[ECU1]がサービス[CMService08]の提供を開始します。<br> [CMService08]は[ECU1]の[CMApp05]にSubscribeされます。<br>アプリケーション[CMApp05] [ECU1]キューはイベントを受信しました。<n>はキューの長さです。|
-
+|  Summary  |  最初に[CMテスター]が[ECU1]と[ECU2]のアプリケーションにMachine StateをDrivingに遷移する要求を出します。<br>[CMテスター] [ECU1]と[ECU2]で拡張診断セッションを要求します。<br>[CMテスター]はアプリケーション[CMApp04] [ECU2]のサービス[CMService08]の提供をトリガーし、次にアプリケーション[CMApp04] [ECU2]または[ECU1]がサービス[CMService08]の提供を開始します。<br> [CMService08]は[ECU1]の[CMApp05]にSubscribeされます。<br>アプリケーション[CMApp05] [ECU1]キューはイベントを受信しました。<n>はキューの長さです。<br>サービス[CMService08]は、[ECU2]上のアプリケーション[CMApp05]インスタンスによってサブスクライブされます。<br>アプリケーション[CMApp05] [ECU2]キューはイベントを受信しました。<n>はキューの長さです。<br>アプリケーション[CMApp05] [ECU1]は、サービス[CMService08]の[CMApp04]によって提供されるサブスクリプションの状態を監視します。<br>アプリケーション[CMApp05] [ECU2]は、サービス[CMService08]の[CMApp04]によって提供されるサブスクリプションの状態を監視します。<br>[CM Tester]は、アプリケーション[CMApp04] [ECU1]をトリガーして、サービス[CMService08]の送信を開始します。<br>
+アプリケーション[CMApp04] [ECU2]は、サービス[CMService08]を介してサービスイベントを送信します。<br>アプリケーション[CMApp05] [ECU2]は、サービス[CMService08]を介してアプリケーション[CMApp04]からイベントを受信するためにポーリングします。<br>
+アプリケーション[CMApp05] [ECU1]は、サービス[CMService08]を介してアプリケーション[CMApp04]からイベントを受信するためにポーリングします。<br>
+[CMテスター]アプリケーション[CMApp05] [ECU2]とアプリケーション[CMApp05] [ECU1]をトリガーして、サービス[CMService08]のサブスクライブを停止します。<br>アプリケーション[CMApp05] [ECU2]アプリケーション[CMApp04]のサービス[CMService08]からのサブスクリプションの状態を監視します。<br>アプリケーション[CMApp05] [ECU1]アプリケーション[CMApp04]のサービス[CMService08]からのサブスクリプションの状態を監視します。<br>サービス検出が成功すると、1対nの通信トポロジが確立されます。<br>注：提供の順序については、提供と要求の特定の順序は必要ありません。|
+| Pre-conditions | - [CMテスター]は両方のECUに接続されています。<br> - 
+両方のECUはMachine State Parkingにあります。<br> - [ECU2]の[CMApp04]、[CMApp05]、[ECU1]の[CMApp05]は、Machine Stateに応じてシャットダウンされます。 |
+| Post-conditions | CMテスターは両方のECUに接続されていません。 |
+| Test Steps | Pass Criteria |
+| Step1 |  |
 > diagnostic sessionって？
 > 
