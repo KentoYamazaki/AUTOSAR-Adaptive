@@ -116,6 +116,7 @@ Service Discovery API : These APIs are used in service discovery process. The fo
 * UnsetSubscriptionStateChangeHandler() 
 * SetReceiveHandler()
 * UnsetReceiveHandler()  
+
 Communication API : These APIs are used in communication between Client and Server. The following APIs are Communication APIs:  
 * Send()
 * Allocate()
