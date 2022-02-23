@@ -38,25 +38,33 @@ Communication Managementテスト（[CMテスター]）でジョブを実行し�
 | Pre-conditions | - [CMテスター]は両方のECUに接続されています。<br> - 両方のECUはMachine State Parkingにあります。<br> - [ECU2]の[CMApp04]、[CMApp05]、[ECU1]の[CMApp05]は、Machine Stateに応じてシャットダウンされます。 |
 | Post-conditions | CMテスターは両方のECUに接続されていません。 |
 | Test Steps | Pass Criteria |
-| Step1 | Request change of Machine State to Driving for [ECU1] and [ECU2]. |
-| Step2 | 
-[CM Tester]
-Trigger Application [CMApp04][ECU2] to Start Offering service [CMService08]. |
-| Step3 | CMApp05][ECU1]
-Subscribe to service [CMService08]. |
-| Step4 | [CMApp05] [ECU1]
-Queue received events, <n> being the queue length |
-| Step5 | [CMApp05][ECU2]
-Subscribe to service [CMService08]. |
-| Step6 | [CMApp05] [ECU2]
-Queue received events, <n> being the queue length |
-| Step7 | [CMApp05][ECU1]
-Monitor state of subscription over service [CMService08]. |
+| Step1<br>Request change of Machine State to Driving for [ECU1] and [ECU2]. |  |
+| Step2<br>[CM Tester]Trigger Application [CMApp04][ECU2] to Start Offering service [CMService08]. |  |
+| Step3<br>[CMApp05][ECU1]Subscribe to service [CMService08]. |  |
+| Step4<br>[CMApp05] [ECU1]Queue received events, <n> being the queue length |  |
+| Step5<br>[CMApp05][ECU2]Subscribe to service [CMService08]. |  |
+| Step6<br>[CMApp05] [ECU2]Queue received events, <n> being the queue length |  |
+| Step7<br>[CMApp05][ECU1]Monitor state of subscription over service [CMService08]. | [CMApp05] [ECU1]gets the current status of subscription and notification if it changes from service [CMService08] of application [CMApp04]. |
+| Step8<br>[CMApp05][ECU2]Monitor state of subscription over service [CMService08]. | [CMApp05] [ECU2]gets the current status of subscription and notification if it changes from service [CMService08] of application [CMApp04].|
+| Step9<br>[CM Tester]Trigger Application [CMApp04][ECU2] to Start sending service [CMService08] | |
+| Step10<br>[CMApp04][ECU2]send only 10 service event [CMService08] | |
+| Step11<br>[CMApp05][ECU2]サービス[CMService08]を介してアプリケーション[CMApp04]からイベントを受信するためにポーリングします。| [CMApp05] [ECU2]Event is not received over service [CMService05] of application [CMApp04].|
+| Step12<br>[CMApp05][ECU1]サービス[CMService08]を介してアプリケーション[CMApp04]からイベントを受信するためにポーリングします。| [CMApp05] [ECU1]Event is not received over service [CMService05] of application [CMApp04].|
+| Step13<br>[CM Tester]Trigger Application [CMApp05][ECU2] to Stop subscription of service [CMService08]| |
+| Step14<br>[CM Tester]Trigger Application [CMApp05][ECU1] to Stop subscription of service [CMService08]| |
+| Step15<br>[CMApp05] [ECU2]Monitor state of subscription from service [CMService08] of application [CMApp04].| [CMApp05] [ECU2]gets the current status of subscription, i.e. [CMApp05] [ECU2] has stopped subscription from service [CMService05].|
+| Step16<br>[CMApp05] [ECU1]Monitor state of subscription from service [CMService08] of application [CMApp04].| [CMApp05] [ECU1]gets the current status of subscription, i.e. [CMApp05] [ECU2] has stopped subscription from service [CMService05].|    
 
 > diagnostic sessionって？
 
 > step4よくわからん。Ackのこと？
 
+> passcriteria7,8の具体的実装方法がイメージ湧いていない。サンプルを探しておいた方がいい。
+
+> Step10の10 service eventの部分がよく分からない。イベント通信を10回行うってこと？
+
+> PassCriteria11のService05ってどっから湧いてきた？
+    
 ```mermaid
 sequenceDiagram
     CMTester->>ECU1:[Step1]Request change of Machine State to Driving
@@ -67,5 +75,18 @@ sequenceDiagram
 sequenceDiagram
     CMTester->>CMApp04[ECU2]:[Step2]Trigger Start Offering service [CMService08]
     CMApp05[ECU1]->>CMApp04[ECU2]:[Step3]Subscribe to service [CMService08].
-    CMApp04[ECU2]-->>CMApp05[ECU1]:[Step4]Queue received events, <n> being the queue length   
+    CMApp04[ECU2]-->>CMApp05[ECU1]:[Step4]Queue received events, <n> being the queue length
+    CMApp05[ECU2]->>CMApp04[ECU2]:[Step5]Subscribe to service [CMService08].
+    CMApp04[ECU2]-->>CMApp05[ECU2]:[Step6]Queue received events, <n> being the queue length
+    CMApp05[ECU1]->>who?:[Step7(Criteria)]Monitor state of subscription over service [CMService08].
+    CMApp05[ECU2]->>who?:[Step8(Criteria)]Monitor state of subscription over service [CMService08].
+    CMTester->>CMApp04[ECU2]:[Step9]Trigger Application [CMApp04][ECU2] to Start sending service [CMService08].
+    CMApp04[ECU2]->>CMApp05[ECU1]:[Step10]send only 10 service event [CMService08]
+    CMApp04[ECU2]->>CMApp05[ECU2]:[Step10]send only 10 service event [CMService08]
+    CMApp05[ECU2]->>CMApp05[ECU2]:[Step11]Poll for receiving events from application [CMApp04] over service [CMService08].
+    CMApp05[ECU1]->>CMApp05[ECU1]:[Step12]Poll for receiving events from application [CMApp04] over service [CMService08].
+    CMTester->>CMApp05[ECU2]:[Step13]Trigger Application [CMApp05][ECU2] to Stop subscription of service [CMService08]
+    CMTester->>CMApp05[ECU1]:[Step14]Trigger Application [CMApp05][ECU1] to Stop subscription of service [CMService08]
+    CMApp05[ECU2]->>who?:[Step15]Monitor state of subscription from service [CMService08]   
+    CMApp05[ECU1]->>who?:[Step16]Monitor state of subscription from service [CMService08]
 ```
