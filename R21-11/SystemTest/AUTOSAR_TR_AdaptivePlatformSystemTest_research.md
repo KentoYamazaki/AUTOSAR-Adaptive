@@ -38,6 +38,34 @@ Communication Managementテスト（[CMテスター]）でジョブを実行し�
 | Pre-conditions | - [CMテスター]は両方のECUに接続されています。<br> - 両方のECUはMachine State Parkingにあります。<br> - [ECU2]の[CMApp04]、[CMApp05]、[ECU1]の[CMApp05]は、Machine Stateに応じてシャットダウンされます。 |
 | Post-conditions | CMテスターは両方のECUに接続されていません。 |
 | Test Steps | Pass Criteria |
-| Step1 |  |
+| Step1 | Request change of Machine State to Driving for [ECU1] and [ECU2]. |
+| Step2 | 
+[CM Tester]
+Trigger Application [CMApp04][ECU2] to Start Offering service [CMService08]. |
+| Step3 | CMApp05][ECU1]
+Subscribe to service [CMService08]. |
+| Step4 | [CMApp05] [ECU1]
+Queue received events, <n> being the queue length |
+| Step5 | [CMApp05][ECU2]
+Subscribe to service [CMService08]. |
+| Step6 | [CMApp05] [ECU2]
+Queue received events, <n> being the queue length |
+| Step7 | [CMApp05][ECU1]
+Monitor state of subscription over service [CMService08]. |
+
 > diagnostic sessionって？
-> 
+
+> step4よくわからん。Ackのこと？
+
+```mermaid
+sequenceDiagram
+    CMTester->>ECU1:[Step1]Request change of Machine State to Driving
+    CMTester->>ECU2:[Step1]Request change of Machine State to Driving    
+```
+
+```mermaid
+sequenceDiagram
+    CMTester->>CMApp04[ECU2]:[Step2]Trigger Start Offering service [CMService08]
+    CMApp05[ECU1]->>CMApp04[ECU2]:[Step3]Subscribe to service [CMService08].
+    CMApp04[ECU2]-->>CMApp05[ECU1]:[Step4]Queue received events, <n> being the queue length   
+```
