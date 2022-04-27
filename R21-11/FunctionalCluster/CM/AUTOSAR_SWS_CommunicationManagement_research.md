@@ -1,4 +1,13 @@
-### 7.10 Communication API
+##### 7.8.1.7 Handling Fields
+[SWS_CM_10319] Conditions for sending of a SOME/IP event message  
+「  
+SOME / IPイベントメッセージの送信は、それぞれのフィールドクラスのUpdateメソッドを呼び出すことによって（[SWS_CM_00119]を参照）、またはRegisterSetHandlerに登録されたSetHandlerによって返されるFuture（[SWS_CM_00116]を参照）が少なくとも1つのアクティブなサブスクライバーがあり、イベントを含むサービスの提供が停止されていない場合（SOME / IP OfferServiceメッセージ（[SWS_CM_00203]を参照）に含まれるTTLが期限切れになっているため、またはStopOfferServiceメソッド（を参照） ServiceSkeletonクラスの[SWS_CM_00111]）が呼び出されました）。アクティブなサブスクライバーは、それぞれのFieldクラスのSubscribeメソッド（[SWS_CM_00120]を参照）を呼び出し、それぞれのFieldクラスのUnsubscribeメソッド（[SWS_CM_00120]を参照）を呼び出してサブスクリプションをキャンセルしていないAdaptive Applicationです。また、SOME / IP SubscribeEventgroupメッセージ（[SWS_CM_00205]を参照）に含まれるTTLを超えてから、サブスクリプションの有効期限がまだ切れていない場合。  
+」 
+[SWS_CM_10320] Transport protocol for sending of a SOME/IP event message  
+「
+マニフェストのロールeventGroupのProvidedSomeipServiceInstanceによって集約されるSomeipProvidedEventGroupのmulticastThreshold属性によって定義されたしきい値に達した場合、SOME / IPイベントメッセージはUDPを使用して送信されます（[PRS_SOMEIPSD_00134]を参照）。 SOME / IPイベントメッセージは、属性SomeipServiceInterfaceDeployment.fieldDeployment.notifierで定義されたトランスポートプロトコルを使用して送信されます。このしきい値に達していない場合は、マニフェストのtransportProtocol（[PRS_SOMEIPSD_00802]を参照）。
+」
+
 #### 7.10.1 Offer service
 [SWS_CM_00102]{DRAFT} Uniqueness of offered service on local machine  
 「
@@ -51,7 +60,29 @@ Communication Managementは、InstanceIdentifierContainer引数の値をチェ�
 失敗したチェックがあり、同じサービスの複数のスケルトンインスタンスの作成に同じInstanceIdentifierが使用された場合、[SWS_CORE_00003]に従って違反として処理されるものとします。
 」  
 
+#### 7.10.5 Registering set handlers for fields
+[SWS_CM_10413]{DRAFT} Invoking SetHandlers  
+「
+登録されたSetHandlerは、CommunicationManagementがSetを受信するたびに実装によって呼び出されるものとします。
+」  
+注：SetHandlerを呼び出すと、サービスプロバイダーは受信したフィールド値を検証する必要があります（受け入れ、変更、または拒否できます）。その後、futureオブジェクトに新しい値を設定します（[SWS_CM_00116]を参照）。 SetHandlerが現在のフィールド値にアクセスして新しいフィールド値を検証する必要がある場合、スケルトン実装は、アプリケーションレベルからアクセス可能な基になるフィールド値のレプリカを提供する必要があります。  
+[SWS_CM_10415]{DRAFT} Notify the Field value after a call to the SetHandler function  
+「
+Communication Managementの実装は、SetHandler関数によって返された有効なフィールド値を取得し、それをset関数の戻り値としてリクエスターに送り返し（[SWS_CM_00113]を参照）、notificationを介して他のすべてのサブスクライブされたエンティティに送り返します。
+」  
 
+[SWS_CM_00128]{DRAFT} Ensuring the existence of valid Field values  
+「
+Subscribe（）メソッド（[SWS_CM_00141]を参照）またはGet（）メソッド（[SWS_CM_00112]を参照）の呼び出し時に有効なフィールド値が存在することを確認するには、ara::comの実装で以下：フィールドを含むサービスがOfferService（）の呼び出しを介して提供される場合（[SWS_CM_00101]を参照）、Update（）がまだ呼び出されておらず、次の1つ以上が適用される場合:  
+* hasNotifier = true
+* hasGetter = true and a GetHandler (see [SWS_CM_00114]) has not yet been registered.
+次に、エラーコードComErrc::kFieldValueIsNotValidがOfferService（）のResultタイプで返されます。
+エラーはログに記録されます。
+」  
+[SWS_CM_00129]{DRAFT} Ensuring the existence of SetHandler  
+「
+特定のサービスのスケルトン実装でOfferService（）を呼び出すと、次のエラーチェックが行われます。hasSetter=trueの含まれるフィールドが少なくとも1つある場合、SetHandler（[SWS_CM_00116]を参照）がまだ登録されていない場合、エラーコードCom-Errc::kSetHandlerNotSetは、OfferService（）のResultタイプで返されます。エラーはログに記録されます。
+」
 #### 8.1.2 API Data Types
 ##### 8.1.2.1 Service Identifier Data Types
 この章で説明するデータ型は、ara :: com API設計から派生し、APIの一部として、特定のサービスまたはサービスインスタンスを識別するために使用されます。  
@@ -447,3 +478,4 @@ Communication Managementは、ServiceSkeletonのデストラクタを提供す�
 ~ServiceSkeleton();
 ```
 」  
+##### 8.1.3.9 Registering set handlers for fields
