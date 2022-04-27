@@ -1,3 +1,55 @@
+##### 7.8.1.3 Executioin context of message reception actions
+次のセクションでは、「受信時」という用語は、特定のアクション（[SWS_CM_10294]に従ったペイロードの逆シリアル化など）がメッセージの実際の受信とそれぞれのEventクラスの対応するAPI（たとえば、GetNewSamples（[SWS_CM_00701]を参照）メソッド）の呼び出し。この仕様は、これらのアクションがメッセージ受信のコンテキストで実行されるのか、API呼び出しのコンテキストで実行されるのか、または完全に別個の実行コンテキストで実行されるのかを意図的に明示しておらず、具体的なara::com実装の潜在的な最適化の余地を残しています。　　
+ここで課せられる唯一の制限は、EventReceiveHandlerの実行コンテキストに関するものです（[SWS_CM_00309]を参照）。 – GetNewSamples（[SWS_CM_00701]を参照）メソッドのコンテキストでEventReceiveHandlerを実行することは許可されていません。これは、[SWS_CM_00181]に従って、EventReceiveHandlersがGet-NewSamplesメソッドを使用して取得したイベントデータにアクセスするためです。  
+[SWS_CM_11270]{DRAFT} Selecting elements of the ServiceInterface for SecOC transmission  
+「
+特定のAdaptivePlatformServiceInstanceのServiceInterfaceのどの要素をSecOCによって保護するかを定義することができます。  
+ServiceInterface要素の選択は、AdaptivePlatformServiceInstanceによって集約されるServiceInterfaceElementSecureComConfigによって行われます。  
+ServiceInterfaceElementSecureComConfigの次の構成が適用可能です。:  
+* Methods  
+ロールmethodCallおよびmethodReturnは、ServiceInterfaceElementSecureComConfig要素で使用可能な構成設定を使用してSecOCによって保護されるメソッドを識別します。  
+* Events  
+ロールイベントは、ServiceInterfaceElementSecureComConfig要素で使用可能な構成設定を使用してSecOCによって保護されるイベントを識別します。  
+* Fields  
+ロールfieldNotifier、getterCall、getterReturn、setterCall、およびsetterReturnは、ServiceInterfaceElementSecureComConfig要素で使用可能な構成設定を使用してSecOCによって保護されるフィールドコンテンツを識別します。
+」
+##### 7.8.1.4 Handling Events
+[SWS_CM_10287] Conditions for sending of a SOME/IP event message  
+「
+少なくとも1人のアクティブな加入者がいて、イベントを含むサービスの提供に停止されていない（SOME / IP OfferServiceメッセージ（[SWS_CM_00203]を参照）に含まれるTTLが期限切れになったか、ServiceSkeletonクラスのStopOfferServiceメソッド（[SWS_CM_00111]を参照）が呼び出されたため）。アクティブなサブスクライバーは、それぞれのイベントクラスのSubscribeメソッド（[SWS_CM_00141]を参照）を呼び出し、それぞれのEventクラスのUnsubscribeメソッド（[SWS_CM_00151]を参照）を呼び出してサブスクリプションをキャンセルしていないAdaptive Applicationです。 SOME / IPSubscribeEventgroupメッセージ（[SWS_CM_00205]を参照）に含まれるTTLを超えたため、サブスクリプションはまだ有効期限が切れていません。
+」  
+[SWS_CM_10288] Transport protocol for sending of a SOME/IP event message  
+「
+マニフェストのロールevent-GroupのProvidedSomeipServiceInstanceによって集約されたSomeipProvidedEventGroupのmulticastThreshold属性によって定義されたしきい値に達した場合、SOME / IPイベントメッセージはUDPを使用して送信されます（[PRS_SOMEIPSD_00134]を参照）。  
+SOME / IPイベントメッセージは、このしきい値に達していない場合、マニフェストの属性SomeipServiceInterfaceDeployment.eventDeployment.transportProtocolで定義されたトランスポートプロトコルを使用して送信されます（[PRS_-SOMEIPSD_00802]を参照）。
+」  
+[SWS_CM_10289] Source of a SOME/IP event message  
+「
+SOME / IPイベントメッセージは、SOME / IP OfferServiceメッセージ（[SWS_CM_00203]）のIPv4 / v6エンドポイントオプション（[PRS_SOMEIPSD_00304]を参照）から取得したユニキャストIPアドレスとポートを、トランスミッション。
+」  
+[SWS_CM_10290] Destination of a SOME/IP event message  
+「
+SOME / IPイベントメッセージは、SOME / IPSubscribeEventgroupAckメッセージ（[SWS_CM_00206]を参照）のIPv4 / v6マルチキャストオプション（[PRS_SOMEIPSD_00322]を参照）から取得したマルチキャストIPアドレスとポートを宛先アドレスと宛先ポートとして使用するものとします。マニフェストのロールeventGroupのProvidedSomeipServiceInstanceによって集約されたSomeipProvidedEventGroupのmulticastThreshold属性によって定義されたしきい値に達した場合の送信（[PRS_-SOMEIPSD_00134]を参照）。 SOME / IPイベントメッセージは、送信の宛先アドレスと宛先ポートとして、SOME / IPSubscribeEventgroupメッセージ（[SWS_CM_00205]）のIPv4 / v6エンドポイントオプション（[PRS_SOMEIPSD_00304]を参照）から取得したユニキャストIPアドレスとポートを使用するものとします。このしきい値に達していない場合（[PRS_SOMEIPSD_00134]を参照）。 SOME / IPSubscribeEventgroupメッセージに複数のエンドポイントオプションが含まれている場合は、選択したトランスポートプロトコル（[SWS_CM_10289]を参照）に一致するものを使用する必要があります。
+」  
+
+[SWS_CM_10291] Content of the SOME/IP event message  
+「
+SOME/IPイベントメッセージのエントリは次のとおりです。：  
+* サービスID（[PRS_SOMEIP_00040]を参照）は、SomeipServiceInterfaceDeployment要素がserviceInterfaceIdを定義するマニフェストから取得されます。
+* イベントID（[PRS_SOMEIP_00040]を参照）は、SomeipServiceInterfaceDeployment要素がeventDeployment.eventIdを定義するマニフェストから取得されます。
+* 長さ（[PRS_SOMEIP_00042]を参照）は、8ずつインクリメントされたバイト単位のシリアル化されたペイロードの長さに設定されます（長さでカバーされるSOME / IPヘッダーの2番目の部分）。
+* クライアントID（[PRS_SOMEIP_00702]を参照）はイベントメッセージ（[PRS_SOMEIP_00702]による）には使用されないため、0x0000に設定する必要があります。
+* 非アクティブなセッション処理の場合は、[SWS_CM_10240]を参照してください。セッションID（[PRS_SOMEIP_00703]を参照）はイベントメッセージに使用されないため、0x0000（[PRS_SOMEIP_00932]を参照）および[PRS_SOMEIP_00925]に設定されます。  
+
+アクティブなセッション処理の場合（[SWS_CM_10240]を参照）、セッションIDはイベントメッセージに使用されるため、イベントメッセージが送信されるたびに（適切なラップアラウンドで）インクリメントされます（[PRS_SOMEIP_- 00933]、[PRS_SOMEIP_00934]を参照]。 [PRS_SOMEIP_00521]、および[PRS_SOMEIP_- 00925]）。  
+イベントに対してセッション処理がアクティブ化されているか非アクティブ化されているかに関する情報は、イベントを指すTransformation-PropsToServiceInterfaceElementMappingによって参照されるAp-SomeipTransformationPropsに含まれるsessionHandling属性から取得できます。  
+* プロトコルバージョン（[PRS_SOMEIP_00052]を参照）は0x01に設定する必要があります。
+* インターフェイスバージョン（[PRS_SOMEIP_00053]を参照）は、SomeipServiceInterfaceDeployment要素がserviceInterfaceVersion.majorVersionを定義するマニフェストから派生する必要があります。
+* メッセージタイプ（[PRS_SOMEIP_00055]を参照）は、NOTIFICATION（0x02）に設定する必要があります。
+* リターンコード（[PRS_SOMEIP_00058]および[PRS_SOMEIP_00191]を参照）はイベントメッセージに使用されないため、（[PRS_SOMEIP_00925]による）E_OK（0x00）に設定する必要があります。
+* ペイロードには、SOME / IPシリアル化ルールに従ってシリアル化されたペイロード（つまり、ロールイベントでServiceInterfaceによって構成されるシリアル化されたVariable-DataPrototype）が含まれている必要があります。
+」
+
 ##### 7.8.1.7 Handling Fields
 [SWS_CM_10319] Conditions for sending of a SOME/IP event message  
 「  
@@ -7,6 +59,12 @@ SOME / IPイベントメッセージの送信は、それぞれのフィール�
 「
 マニフェストのロールeventGroupのProvidedSomeipServiceInstanceによって集約されるSomeipProvidedEventGroupのmulticastThreshold属性によって定義されたしきい値に達した場合、SOME / IPイベントメッセージはUDPを使用して送信されます（[PRS_SOMEIPSD_00134]を参照）。 SOME / IPイベントメッセージは、属性SomeipServiceInterfaceDeployment.fieldDeployment.notifierで定義されたトランスポートプロトコルを使用して送信されます。このしきい値に達していない場合は、マニフェストのtransportProtocol（[PRS_SOMEIPSD_00802]を参照）。
 」
+
+> プロトコルはUDPで良さそう。  
+
+[SWS_CM_10321] Source of a SOME/IP event message ⌈  
+SOME / IPイベントメッセージの送信元アドレスと送信元ポートは、[SWS_CM_10289]に従って設定する必要があります。
+」  
 
 #### 7.10.1 Offer service
 [SWS_CM_00102]{DRAFT} Uniqueness of offered service on local machine  
