@@ -1,3 +1,9 @@
+## 7 Functional specification
+### 7.1 General description
+AUTOSARAdaptiveアーキテクチャは、AUTOSARAdaptive FoundationのソフトウェアをFunctional clusterとして編成します。これらのクラスターは、アプリケーションへのサービスとして共通の機能を提供します。 AUTOSARAdaptiveのCommunicationManagement（CM）は、このようなFunctional Clusterであり、「AUTOSAR RuntimeforAdaptiveApplications」-ARAの一部です。ローカルとリモートの両方のアプリケーション間の通信パスの構築と監視を担当します。  
+CMは、1台のマシン内のAdaptive AUTOSARアプリケーション間、および他のマシン上のソフトウェアエンティティとの通信を可能にするインフラストラクチャを提供します。その他のAdaptiveAUTOSARアプリケーションまたはClassicAUTOSARSWC。すべての通信パスは、設計時、起動時、または実行時に確立できます。  
+この仕様には、APIの構文、APIとモデルの関係が含まれ、セマンティクスが記述されています。ステートマシンを介して、事前条件、事後条件、およびAPIの使用を想定します。この仕様では、プラットフォーム実装のSWアーキテクチャに制約がないため、基本的なソフトウェアモジュールの定義や、CommunicationManagementの実装または内部技術アーキテクチャの仕様はありません。  
+
 ##### 7.8.1.3 Executioin context of message reception actions
 次のセクションでは、「受信時」という用語は、特定のアクション（[SWS_CM_10294]に従ったペイロードの逆シリアル化など）がメッセージの実際の受信とそれぞれのEventクラスの対応するAPI（たとえば、GetNewSamples（[SWS_CM_00701]を参照）メソッド）の呼び出し。この仕様は、これらのアクションがメッセージ受信のコンテキストで実行されるのか、API呼び出しのコンテキストで実行されるのか、または完全に別個の実行コンテキストで実行されるのかを意図的に明示しておらず、具体的なara::com実装の潜在的な最適化の余地を残しています。　　
 ここで課せられる唯一の制限は、EventReceiveHandlerの実行コンテキストに関するものです（[SWS_CM_00309]を参照）。 – GetNewSamples（[SWS_CM_00701]を参照）メソッドのコンテキストでEventReceiveHandlerを実行することは許可されていません。これは、[SWS_CM_00181]に従って、EventReceiveHandlersがGet-NewSamplesメソッドを使用して取得したイベントデータにアクセスするためです。  
