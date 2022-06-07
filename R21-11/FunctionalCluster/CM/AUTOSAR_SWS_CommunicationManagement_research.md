@@ -127,6 +127,66 @@ SOME / IPイベントメッセージの送信は、それぞれのフィール�
 SOME / IPイベントメッセージの送信元アドレスと送信元ポートは、[SWS_CM_10289]に従って設定する必要があります。
 」  
 
+##### 7.8.1.8 Structured Data Types(structs)
+[SWS_CM_00252] Missing size of length field for structs  
+「  
+属性SomeipDataPrototypeTransformationProps.someipTransformationProps.sizeOf-StructLengthFieldが0に等しい値に設定されている場合、ApSomeipTransformationPropsがSomeipDataPrototypeTransformationProps.someipTransformationPropsを介して定義されているシリアル化された構造体の前に長さフィールドを挿入しないでください。
+」  
+[SWS_CM_00253] Default size of length field for structs  
+「  
+TransformationPropsToServiceInterfaceElementMapping.transformationProps.sizeOfStructLengthFieldが0に等しい値に設定され、属性Someip- DataPrototypeTransformationProps.someipTransformationProps.sizeOfStructLengthFieldが設定されていない場合、ApSomeipTransformationPropsがSomeipDataProsを介して定義されるシリアル化された構造体の前に長さフィールドを挿入しないでください。
+」    
+[SWS_CM_00254] Precedence when setting size of length field for structs 
+「  
+If attribute TransformationPropsToServiceInterfaceElementMapping.trans- formationProps.sizeOfStructLengthField is set to a value greater 0 and attribute SomeipDataPrototypeTransformationProps.someipTransfor- mationProps.sizeOfStructLengthField is not set, a length field shall be inserted in front of the serialized struct for which the ApSomeipTransformation- Props is defined via SomeipDataPrototypeTransformationProps.someip- TransformationProps.
+」  
+
+[SWS_CM_00255] Default size of length field for structs  
+「  
+If attribute Trans- formationPropsToServiceInterfaceElementMapping.transformation- Props.sizeOfStructLengthField is not set and attribute SomeipDataPro- totypeTransformationProps.someipTransformationProps.sizeOf- StructLengthField is not set, no length field shall be inserted in front of the serialized struct.
+」  
+
+[SWS_CM_00256] Default data type for the length field of structs  
+「  
+If TransformationPropsToServiceInterfaceElementMapping.transformationProps. sizeOfStructLengthField defines the the data type for the length field of a struct, the data shall be:  
+* uint8 if sizeOfStructLengthField equals 1
+* uint16 if sizeOfStructLengthField equals 2
+* uint32 if sizeOfStructLengthField equals 4
+」  
+
+[SWS_CM_00257] Missing size of array length field  
+「  
+If attribute SomeipDataPrototypeTransformationProps.someipTransformationProps.sizeO- fArrayLengthField is set to a value equal to 0, no length field shall be inserted in front of the serialized array for which the ApSomeipTransformationProps is defined via SomeipDataPrototypeTransformationProps.someipTransfor- mationProps. – Note that omitting the length field by setting someipTransforma- tionProps.sizeOfArrayLengthField to 0 is only allowed for arrays with static length (i.e., fixed length arrays) though (see also [constr_3447]).⌋
+」  
+[SWS_CM_00258] Default size of the length field for arrays  
+「  
+If attribute TransformationPropsToServiceInterfaceElementMapping.transforma- tionProps.sizeOfArrayLengthField is set to a value equal to 0 and attribute SomeipDataPrototypeTransformationProps.someipTransformation- Props.sizeOfArrayLengthField is not set, no length field shall be inserted in front of the serialized array for which the ApSomeipTransformationProps is defined via SomeipDataPrototypeTransformationProps.someipTransfor- mationProps. – Note that omitting the length field by setting someipTransforma- tionProps.sizeOfArrayLengthField to 0 is only allowed for arrays with static length (i.e., fixed length arrays) though (see also [constr_3447]).
+」  
+
+[SWS_CM_00259] Setting size of the length field for arrays  
+「  
+If attribute TransformationPropsToServiceInterfaceElementMapping.transforma- tionProps.sizeOfArrayLengthField is set to a value greater 0 and attribute SomeipDataPrototypeTransformationProps.someipTransformation- Props.sizeOfArrayLengthField is not set, a length field shall be inserted in front of the serialized array for which the ApSomeipTransformationProps is defined via SomeipDataPrototypeTransformationProps.someipTransformation- Props.
+」  
+[SWS_CM_00260] Datatype for the length field of arrays  
+「
+If Transforma- tionPropsToServiceInterfaceElementMapping.transformationProps. sizeOfArrayLengthField defines the the data type for the length field of a array, the data shall be:
+* uint8 if sizeOfArrayLengthField equals 1 
+* uint16 if sizeOfArrayLengthField equals 2 
+* uint32 if sizeOfArrayLengthField equals 4
+」  
+
+##### 7.8.1.8.8 Associative Maps
+連想マップは、マニフェストのカテゴリASSOCIATIVE_MAPを持つStdCppImplementationDataTypeとしてモデル化されます。 AUTOSARマニフェスト仕様[6]で述べられているように、連想マップのC++での「自然な」言語バインディングはara:: core：-：Map <key_type、value_type>です。ここでkey_typeは、 map要素とvalue_typeは、マップ要素の値のデータ型です。これにより、key_typeとvalue_typeは、連想マップCpp実装データ型によって集約された定義済みのCppTemplate引数から派生します。詳細については、[SWS_LBAP_00023]を参照してください。  
+[SWS_CM_00264] Setting the size of the length field for associative maps  
+「  
+If at- tribute TransformationPropsToServiceInterfaceElementMapping.trans- formationProps.sizeOfArrayLengthField is set to a value greater 0 and attribute SomeipDataPrototypeTransformationProps.someipTransfor- mationProps.sizeOfArrayLengthField is not set, a length field shall be in- serted in front of the serialized associative map for which the ApSomeipTrans- formationProps is defined via SomeipDataPrototypeTransformationProps. someipTransformationProps. – Note that omitting the length field by setting someipTransformationProps.sizeOfArrayLengthField to 0 is only allowed for arrays with static length (i.e., fixed length arrays) though (see also [constr_3447]).
+」  
+[SWS_CM_00265] Datatype for the length field of associative maps ⌈If Trans- formationPropsToServiceInterfaceElementMapping.transformation- Props.sizeOfArrayLengthField defines the the data type for the length field of an associative map, the data shall be:
+* uint8 if sizeOfArrayLengthField equals 1 
+* uint16 if sizeOfArrayLengthField equals 2 
+* uint32 if sizeOfArrayLengthField equals 4
+」
+
 #### 7.10.1 Offer service
 [SWS_CM_00102]{DRAFT} Uniqueness of offered service on local machine  
 「
@@ -598,3 +658,26 @@ Communication Managementは、ServiceSkeletonのデストラクタを提供す�
 ```
 」  
 ##### 8.1.3.9 Registering set handlers for fields
+ 
+##### 8.1.3.14 Receive event
+[SWS_CM_00027]{DRAFT} Re-entrancy and thread-safety - GetFreeSample- Count  
+「   
+GetFreeSampleCountは、イベントクラスインスタンスに関係なく、再入可能でスレッドセーフである必要があります。つまり、GetFreeSampleCountは、同じイベントクラスインスタンスおよび異なるイベントクラスインスタンスに対して再入可能でスレッドセーフである必要があります。  
+」  
+##### 8.1.3.17 Receive Trigger
+特定のServiceProxyクラスに属する特定のTriggerクラス内に、受信したトリガーへのアクセスを可能にするGetNewTriggersメソッドを提供する必要があります。  
+ [SWS_CM_00226]{DRAFT} Method to update the trigger counter   
+「  
+ CMは、trigger counterを更新するためのTrigger Classの一部としてGetNewTriggersメソッドを提供する必要があります。
+ ```
+ std::size_t GetNewTriggers();
+ ```
+ 」 
+ [SWS_CM_00227]{DRAFT} Sequence of actions in GetNewTriggers   
+ 「  
+ GetNewTriggers呼び出しのコンテキストでは、Communication Managementは、GetNewTriggersの最後の呼び出し以降に発生したトリガーの数を取得する必要があります。
+ 」  
+ [SWS_CM_00228]{DRAFT} Return Value   
+ 「  
+ 返されるsize_tは、GetNewTriggersへの最後の呼び出し以降に発生したトリガーの数を示します（ゼロ値は、新しいトリガーが受信されていないことを意味します）。
+ 」  
