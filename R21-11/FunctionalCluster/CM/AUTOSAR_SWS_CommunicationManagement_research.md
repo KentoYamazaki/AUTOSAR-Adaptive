@@ -74,6 +74,7 @@ E2Eで保護されたイベントの場合、E2E保護はSendのコンテキス�
 Figure 7.5 shows an overview of the interaction of components involved during the E2E
 protection at the publisher side.  
 
+![](./image/Figure7.5.png)
 
 ##### 7.8.1.3 Executioin context of message reception actions
 次のセクションでは、「受信時」という用語は、特定のアクション（[SWS_CM_10294]に従ったペイロードの逆シリアル化など）がメッセージの実際の受信とそれぞれのEventクラスの対応するAPI（たとえば、GetNewSamples（[SWS_CM_00701]を参照）メソッド）の呼び出し。この仕様は、これらのアクションがメッセージ受信のコンテキストで実行されるのか、API呼び出しのコンテキストで実行されるのか、または完全に別個の実行コンテキストで実行されるのかを意図的に明示しておらず、具体的なara::com実装の潜在的な最適化の余地を残しています。　　
