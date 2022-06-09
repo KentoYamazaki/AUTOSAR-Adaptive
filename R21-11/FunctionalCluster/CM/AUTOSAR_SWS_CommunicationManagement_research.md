@@ -1,3 +1,10 @@
+## 2 Acronyms and Abbreviations
+* Callable:
+C ++のコンテキストでは、Callableは次のように定義されます。Callableタイプは、INVOKE操作（std :: function、std :: bind、std :: thread :: threadなどで使用される）が適用可能なタイプです。この操作は、ライブラリ関数std::invokeを使用して明示的に実行できます。 （C ++ 17以降）  
+* serializedSample:  
+serializedSampleは、C ++オブジェクトの配列へのシリアル化であり、e2e保護の一部であるヘッダーとシリアル化されたデータで構成されます。  
+
+
 ## 7 Functional specification
 ### 7.1 General description
 AUTOSARAdaptiveアーキテクチャは、AUTOSARAdaptive FoundationのソフトウェアをFunctional clusterとして編成します。これらのクラスターは、アプリケーションへのサービスとして共通の機能を提供します。 AUTOSARAdaptiveのCommunicationManagement（CM）は、このようなFunctional Clusterであり、「AUTOSAR RuntimeforAdaptiveApplications」-ARAの一部です。ローカルとリモートの両方のアプリケーション間の通信パスの構築と監視を担当します。  
@@ -58,6 +65,15 @@ std :: future、std :: promise、異なるコンテキスト間のメソッド�
 * API設計のC++11/14機能を十分に活用して、アプリケーション開発者に使いやすさと快適さを提供します。
 
 ARA API設計の詳細と説明については、ARAComAPIの説明[1]を参照してください。
+
+#### 7.2.2 Publisher
+[SWS_CM_90453]{DRAFT}  
+「  
+E2Eで保護されたイベントの場合、E2E保護はSendのコンテキスト内で実行されるものとします。
+」  
+Figure 7.5 shows an overview of the interaction of components involved during the E2E
+protection at the publisher side.  
+
 
 ##### 7.8.1.3 Executioin context of message reception actions
 次のセクションでは、「受信時」という用語は、特定のアクション（[SWS_CM_10294]に従ったペイロードの逆シリアル化など）がメッセージの実際の受信とそれぞれのEventクラスの対応するAPI（たとえば、GetNewSamples（[SWS_CM_00701]を参照）メソッド）の呼び出し。この仕様は、これらのアクションがメッセージ受信のコンテキストで実行されるのか、API呼び出しのコンテキストで実行されるのか、または完全に別個の実行コンテキストで実行されるのかを意図的に明示しておらず、具体的なara::com実装の潜在的な最適化の余地を残しています。　　
@@ -187,6 +203,18 @@ If at- tribute TransformationPropsToServiceInterfaceElementMapping.trans- format
 * uint32 if sizeOfArrayLengthField equals 4
 」
 
+##### 7.8.3.3 Handling Events
+[SWS_CM_11024] Mapping of GetFreeSampleCount method  
+「  
+空きサンプルスロットの数を提供するように指示された場合、バインディング実装は、DDSDataReaderのキャッシュ内の空きサンプルスロットの数を返す必要があります。
+」  
+
+##### 7.8.3.6 Handling Fields
+[SWS_CM_11139] Mapping of GetFreeSampleCount method
+「  
+GetFreeSampleCountメソッドは、[SWS_CM_11134]で作成されたDataReaderを使用して、[SWS_CM_11024]で指定されたとおりにマップされます。
+」  
+
 #### 7.10.1 Offer service
 [SWS_CM_00102]{DRAFT} Uniqueness of offered service on local machine  
 「
@@ -262,6 +290,13 @@ Subscribe（）メソッド（[SWS_CM_00141]を参照）またはGet（）メソ
 「
 特定のサービスのスケルトン実装でOfferService（）を呼び出すと、次のエラーチェックが行われます。hasSetter=trueの含まれるフィールドが少なくとも1つある場合、SetHandler（[SWS_CM_00116]を参照）がまだ登録されていない場合、エラーコードCom-Errc::kSetHandlerNotSetは、OfferService（）のResultタイプで返されます。エラーはログに記録されます。
 」
+
+#### 7.10.7.2 Receive event by getting triggered
+[SWS_CM_00711]{DRAFT} 
+「
+Communication Managementが特定のイベントクラスインスタンスに対して登録されたEventReceiveHandler関数を呼び出した後、同じインスタンスでのGetNewSamplesの次の呼び出しは、呼び出しの時点でGetFreeSampleCountがまだ0を返さない限り、少なくとも1つのデータサンプルを提供する必要があります。
+」
+
 #### 8.1.2 API Data Types
 ##### 8.1.2.1 Service Identifier Data Types
 この章で説明するデータ型は、ara :: com API設計から派生し、APIの一部として、特定のサービスまたはサービスインスタンスを識別するために使用されます。  
@@ -660,10 +695,40 @@ Communication Managementは、ServiceSkeletonのデストラクタを提供す�
 ##### 8.1.3.9 Registering set handlers for fields
  
 ##### 8.1.3.14 Receive event
+特定のServiceProxyクラスに属する特定のEventクラス内に、GetNewSamplesメソッドとGetFreeSampleCountメソッドを提供して、受信したイベントにアクセスできるようにする必要があります。  
+[SWS_CM_00701] Method to update the event cache   
+ 「  
+CMは、イベントクラスの一部としてGetNewSamplesメソッドを提供して、その間に受信したデータサンプルでイベントキャッシュを更新する必要があります。 GetNewSamplesメソッドは、入力パラメーターとしてCallable fを想定し、maxNumberOfSamplesを指定して、この呼び出しで処理される受信データサンプルの数を制限できます。  
+ ```
+ template <typename F>
+ara::core::Result<std::size_t> GetNewSamples(
+        F&& f,
+        std::size_t maxNumberOfSamples =
+                std::numeric_limits<std::size_t>::max());
+ ```
+ 」  
 [SWS_CM_00027]{DRAFT} Re-entrancy and thread-safety - GetFreeSample- Count  
 「   
 GetFreeSampleCountは、イベントクラスインスタンスに関係なく、再入可能でスレッドセーフである必要があります。つまり、GetFreeSampleCountは、同じイベントクラスインスタンスおよび異なるイベントクラスインスタンスに対して再入可能でスレッドセーフである必要があります。  
-」  
+」 
+[SWS_CM_00705] Query Free Sample Slots
+「
+Communication Managementは、イベントクラスの一部としてGetFreeSampleCountメソッドを提供し、イベントサンプルデータの空き/未使用スロットの数を照会します。
+```
+ std::size_t GetFreeSampleCount() const noexcept;
+```
+ 」
+
+[SWS_CM_00706] Return Value of GetFreeSampleCount
+「
+ 返されるsize_tは、ローカルキャッシュ内のイベントサンプルデータ用の空き/未使用スロットの数を示します。
+ 」  
+ 
+[SWS_CM_00027]{DRAFT} Re-entrancy and thread-safety - GetFreeSample- Count
+「  
+ GetFreeSampleCountは、イベントクラスインスタンスに関係なく、再入可能でスレッドセーフである必要があります。つまり、GetFreeSampleCountは、同じイベントクラスインスタンスおよび異なるイベントクラスインスタンスに対して再入可能でスレッドセーフである必要があります。
+ 」  
+ 
 ##### 8.1.3.17 Receive Trigger
 特定のServiceProxyクラスに属する特定のTriggerクラス内に、受信したトリガーへのアクセスを可能にするGetNewTriggersメソッドを提供する必要があります。  
  [SWS_CM_00226]{DRAFT} Method to update the trigger counter   
