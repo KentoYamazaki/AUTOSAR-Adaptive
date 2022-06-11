@@ -443,6 +443,48 @@ std::function<void(ServiceHandleContainer<T>, FindServiceHandle)>;
 ```
 」  
 
+##### 8.1.2.2 Event Related Data Types
+受信側でのイベント処理は、構成可能なキャッシュサイズを使用したキュー通信に基づいています。プロキシインスタンスの特定のイベントのキャッシュサイズは、[SWS_CM_00141]によって特定のイベントをサブスクライブするときに、CommunicationManagementによって決定されます。  
+受信者がイベントをサブスクライブした後、[SWS_CM_00701]で定義されているメソッドGetNewSamplesを使用して、そのイベントのデータサンプルを取得します。 GetNewSamplesアプリケーションのコンテキストでは、提供されるコールバック関数はCMによって呼び出され、基になるキューから取得されたデータサンプルへのサンプルポインタが渡されます。サンプルポインタは、イベントデータタイプポインタのエイリアスです。  
+SamplePtrはstd::unique_ptrと同様に動作しますが、機能のサブセットを使用して実装できます。また、参照されたサンプルのProfileCheckStatusによって提供されるE2E結果にアクセスするための追加のメソッドGetProfileCheckStatusも含まれています。  
+[SWS_CM_00306] {DRAFT}Sample Pointer⌈  
+CommunicationManagementは、管理対象データオブジェクトへのポインタを提供するSamplePtrテンプレートを提供するものとします。実装には、少なくとも次のコンストラクター、割り当て演算子、およびメソッドが含まれている必要があります。   
+```
+template< typename T >
+class SamplePtr {
+  // Default constructor
+  constexpr SamplePtr() noexcept;
+  // semantically equivalent to Default constructor
+  constexpr SamplePtr(std::nullptr_t) noexcept;
+  // Copy constructor is deleted
+  SamplePtr ( const SamplePtr& ) = delete;
+  // Move constructor
+  SamplePtr( SamplePtr&& ) noexcept;
+  // Destructor
+  ~SamplePtr() noexcept;
+  // Default copy assignment operator is deleted
+  SamplePtr& operator=( const SamplePtr& ) = delete;
+  // Assignment of nullptr_t
+  SamplePtr& operator=(std::nullptr_t) noexcept;
+  // Move assignment operator
+  SamplePtr& operator=( SamplePtr&& ) noexcept;
+  // Dereferences the stored pointer
+  T& operator*() const noexcept;
+  T* operator->() const noexcept;
+  //Checks if the stored pointer is null
+  explicit operator bool () const noexept;
+  // Swaps the managed object
+  void Swap ( SamplePtr& ) noexcept;
+  //Replaces the managed object
+  void Reset (std::nullptr_t)  noexcept;
+  //Returns the stored object
+  T* Get () const noexcept;
+  // Returns the end 2 end protection check result
+  ara::com::e2e::ProfileCheckStatus GetProfileCheckStatus() const noexcept;
+};  
+```
+」　　
+
 #### 8.1.3 API Reference
 ServiceInterfaceの説明は、サービスAPIヘッダーファイルのコンテンツを生成するための入力です。  
 プロキシヘッダーファイルとスケルトンヘッダーファイルには、ServiceInterface自体とその要素のイベント、メソッド、およびフィールドを表すさまざまなクラスが含まれています。
@@ -708,10 +750,64 @@ ara::core::Result<std::size_t> GetNewSamples(
                 std::numeric_limits<std::size_t>::max());
  ```
  」  
-[SWS_CM_00027]{DRAFT} Re-entrancy and thread-safety - GetFreeSample- Count  
-「   
-GetFreeSampleCountは、イベントクラスインスタンスに関係なく、再入可能でスレッドセーフである必要があります。つまり、GetFreeSampleCountは、同じイベントクラスインスタンスおよび異なるイベントクラスインスタンスに対して再入可能でスレッドセーフである必要があります。  
-」 
+ 
+[SWS_CM_00702] Signature of Callable f 
+ 「  
+ Callable fを提供したユーザーは、次の署名に準拠する必要があります：  
+ ```
+ void(ara::com::SamplePtr<SampleType const>)
+ ```
+ 」  
+ [SWS_CM_00703] Sequence of actions in GetNewSamples   
+ 「  
+ GetNewSamples呼び出しのコンテキストでは、CommunicationManagementは次の手順を繰り返し実行する必要があります。  
+ * 基になる受信バッファから次に受信したイベントデータサンプルを取得します。
+ * de-serialize the data, if needed.
+ * place the de-serialized data sample of type SampleType in the local cache.
+ * ローカルキャッシュにあるデータサンプルを参照するSamplePtr（ProfileCheckStatusを含む）をユーザーに提供して呼び出します。
+次の条件の少なくとも1つが当てはまるまで：  
+* maxNumberOfSamplesは、このGetNewSamples呼び出し内の基になる受信バッファーから既にフェッチされています。
+* maxSampleCountに達しました。つまりアプリケーションは現在、maxSampleCountを介してSubscribeの呼び出しでコミットした数とまったく同じ数の、このEventクラスインスタンスによって提供されるSamplePtrを保持しています。  
+* 基となる受信バッファから利用できる新しいデータサンプルはありません。
+* size_tは、呼び出しのコンテキストでfに渡されるデータサンプルの数を示します。
+ 」  
+
+[SWS_CM_00704]{DRAFT} Return Value
+「  
+ 返されるara::core::Resultにはara::core :: ErrorCode（[SWS_CORE_00501]を参照）が含まれ、エラードメインはara :: com::ComErrorDomainに設定されます。値はkMaxSamplesExceededでそのアプリケーションを示します。 SamplePtrsカウントを超えました。これは、すべてのSamplePtrが現在アプリケーションによって保持されており、これ以上サンプルを配信できないことを意味します。  
+注：これは、Subscribe（）メソッドで指定されたmaxSampleCountを超えていることを意味します。
+ 」  
+[SWS_CM_11358]{DRAFT} Execution Context to update the event cache 
+「  
+ [SWS_CM_00701]で説明されているGetNewSamplesメソッドの場合、追加の入力パラメーターを使用した2番目のオーバーロードを提供する必要があります。このパラメータは、GetNewSamplesによって生成された非同期計算が呼び出される実行オブジェクトを提供します。実行コンテキストの最小動作は[SWS_CM_11364]で定義されています。
+```
+template<typename ExecutorT>
+ara::core::Result<std::size_t> GetNewSamples(
+        F&& f,
+        std::size_t maxNumberOfSamples =
+                std::numeric_limits<std::size_t>::max(),
+        ExecutorT&& executor);
+```
+実行コンテキスト引数のない最初のオーバーロードには、実装で定義されたデフォルトの実行コンテキスト（以前のAUTOSARリリースのように）を使用する必要があります。
+ 」  
+[SWS_CM_11359]{DRAFT} Error behaviour of provided Execution Context to update the event cache 
+ 「  
+ GetNewSamples（）を提供されたエグゼキュータで実行できない場合（たとえば、リソースの問題のため）、すべての場合でComErrc::kCouldNotExecuteエラーが発生します。
+ 」  
+[SWS_CM_00714] Re-entrancy and thread-safety - GetNewSamples
+「  
+ GetNewSamplesは、さまざまなイベントクラスインスタンスに対して再入可能でスレッドセーフである必要があります。同じイベントクラスインスタンスで再入可能または同時に呼び出された場合、動作は定義されていません。 （必要に応じて、アプリケーションはロックを実装する必要があります）。
+ 」  
+E2Eで保護されたイベントの場合、GetNewSamplesメソッドを介してイベントキャッシュを更新した後、SamplePtrsにアクセスする前に、GetResultメソッドを呼び出して現在の結果を取得する必要があります。  
+[SWS_CM_90424] Provide E2E Result
+「  
+ 特定のServiceProxyクラスに属する特定のE2E保護イベント内に、メソッドGetResultが提供されます。  
+```
+const ara::com::e2e::Result GetResult() const;
+```
+ 
+ 」   
+ 
 [SWS_CM_00705] Query Free Sample Slots
 「
 Communication Managementは、イベントクラスの一部としてGetFreeSampleCountメソッドを提供し、イベントサンプルデータの空き/未使用スロットの数を照会します。
@@ -724,11 +820,18 @@ Communication Managementは、イベントクラスの一部としてGetFreeSamp
 「
  返されるsize_tは、ローカルキャッシュ内のイベントサンプルデータ用の空き/未使用スロットの数を示します。
  」  
- 
+[SWS_CM_00707] Calculation of Free Sample Count 
+「  
+* パラメータmaxSampleCountをNに設定してSubscribeを呼び出した後、同じEventクラスインスタンスでGetNewSamplesを呼び出す前に、GetFreeSampleCountを呼び出すとNが返されます。
+* 同じイベントクラスインスタンスでのGetNewSamplesの呼び出しのコンテキストでCommunicationMiddlewareによって作成された各SamplePtrは、空きサンプルの数の減少につながります。
+* 
+ 」  
+
 [SWS_CM_00027]{DRAFT} Re-entrancy and thread-safety - GetFreeSample- Count
 「  
  GetFreeSampleCountは、イベントクラスインスタンスに関係なく、再入可能でスレッドセーフである必要があります。つまり、GetFreeSampleCountは、同じイベントクラスインスタンスおよび異なるイベントクラスインスタンスに対して再入可能でスレッドセーフである必要があります。
  」  
+ 
  
 ##### 8.1.3.17 Receive Trigger
 特定のServiceProxyクラスに属する特定のTriggerクラス内に、受信したトリガーへのアクセスを可能にするGetNewTriggersメソッドを提供する必要があります。  
@@ -747,3 +850,4 @@ Communication Managementは、イベントクラスの一部としてGetFreeSamp
  「  
  返されるsize_tは、GetNewTriggersへの最後の呼び出し以降に発生したトリガーの数を示します（ゼロ値は、新しいトリガーが受信されていないことを意味します）。
  」  
+ 
