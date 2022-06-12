@@ -192,6 +192,11 @@ If Transforma- tionPropsToServiceInterfaceElementMapping.transformationProps. si
 * uint32 if sizeOfArrayLengthField equals 4
 」  
 
+[SWS_CM_10037] Alignment calculation  
+「  
+アライメントは常にSOME/IPメッセージの先頭から計算されます。
+」  
+
 この属性は、メモリアライメントを定義します。 SOME / IPネットワークバインディングは、パラメータを自動的に整列させようとはしませんが、指定されたとおりに整列します。現在、コードジェネレーターを簡素化するために、アライメントは1バイトの倍数に制限されています。  
 SOME / IPペイロードが適切に整列されるように、SOME/IPペイロードをメモリに配置する必要があります。インフォテインメントECUの場合、8バイト（つまり64ビット）のアラインメントを達成する必要があります。すべてのECUの場合、少なくとも4バイトのアラインメントを達成する必要があります。効率的な調整は、ハードウェアに大きく依存します。  
 [SWS_CM_10016] Deserializing of exceeded unexpected data   
@@ -206,6 +211,65 @@ SOME / IPペイロードが適切に整列されるように、SOME/IPペイロ�
 ![](./image/Table7_1.png)  
 」  
 バイトオーダーは、ApSomeipTransformationPropsのbyteOrderによってすべてのパラメーターに共通に指定されます。  
+
+##### 7.8.1.8.4 Structured Data Types (struct)
+[SWS_CM_10042]SerializingastructDataType  
+「  
+Structure Cpp Implementation Data Typeは、深さ優先探索の順序でシリアル化する必要があります。
+」  
+SOME / IPネットワークバインディングは、構造体のパラメータを自動的に調整しません。
+SOME / IPネットワークバインディングはそのようなパディングを自動的に追加しないため、アライメントに必要な場合は、予約済み/パディング要素をAUTOSARデータ型に挿入します。
+したがって、たとえば構造体にstd::uint8_tとstd::uint32_tが含まれている場合、それらはバッファに順番に書き込まれます。これは、uint8とstd::uint32_tの最初のバイトの間にパディングがないことを意味します。したがって、std::uint32_tが整列されていない可能性があります。したがって、システム設計者は、必要な配置を実現するため、またはグローバルに設定するために、データ型にパディング要素を追加することを検討する必要があります。
+整列されていない構造体などに関する警告は、SOME / IPネットワークバインディングでは行われず、SOME/IPネットワークバインディングの生成に使用されるツールチェーンでのみ行われるものとします。
+SOME / IPネットワークバインディングは、ダミー/パディング要素を自動的に挿入しません。
+SOME / IPでは、構造体の前に8、16、または32ビットの長さフィールドを追加できます。構造体の長さフィールドは、構造体のバイト数を表します。これにより、インターフェイスの移行を改善する拡張可能な構造体が可能になります。
+
+##### 7.8.1.8.6 Strings
+[SWS_CM_10053] Strings encoding
+「  
+Strings shall be encoded using Unicode and terminated with a "\0"-character.
+」  
+[SWS_CM_10054] Supported encoding
+「  
+UTF-8、UTF-16BE、UTF-16LEなどのさまざまなUnicodeエンコーディングがサポートされます。これらのエンコーディングの動的な長さは1文字あたりのバイト数であるため、バイト単位の最大長は、UTF-8の文字の長さの最大3倍に、「\0」またはUTF-16の文字と「\0」の2バイト。 UTF-8文字は最大6バイト、UTF-16文字は最大4バイトです。
+」  
+
+[SWS_CM_10055] UTF-16LE and UTF-16BE terminating bytes
+「  
+UTF-16LEおよびUTF-16BE文字列は、「\0」文字でゼロで終了する必要があります。これは、（少なくとも）2つの0x00バイトで終了することを意味します。
+」  
+[SWS_CM_10056] UTF-16LE and UTF-16BE strings length  
+「  
+UTF-16LE and UTF- 16BE strings shall have an even length.
+」  
+
+[SWS_CM_10057] Odd UTF-16LE and UTF-16BE string length  
+「  
+奇数の長さのUTF-16LEおよびUTF-16BE文字列の場合、最後のバイトは、受信するSOME/IPネットワークバインディングによってサイレントに削除されます。
+」  
+
+[SWS_CM_10058] String start byte(BOM)
+「  
+All strings shall always start with a Byte Order Mark (BOM).
+」  
+
+[SWS_CM_10059] BOM checking by SOME/IP network binding implementation  
+「  
+受信側のSOME/IPネットワークバインディング実装は、BOMをチェックし、完全なペイロードを破棄してインシデントをログに記録することにより、欠落しているBOMまたは不正な形式のBOMをエラーとして処理します（ara :: com実装でログが有効になっている場合）。
+」  
+[SWS_CM_10060] BOM addition 
+「  
+The BOM shall be added by the SOME/IP sending network binding implementation.
+」  
+
+[SWS_CM_10070] Serializing one-dimentional array  
+「  
+一次元配列は、配列要素を順番に連結することによってシリアル化されます。
+」  
+[SWS_CM_10072] Serializing multi-dimentional array  
+「  
+The serialization of multidimensional arrays shall happen in depth-first order.
+」  
 
 
 ##### 7.8.1.8.8 Associative Maps
