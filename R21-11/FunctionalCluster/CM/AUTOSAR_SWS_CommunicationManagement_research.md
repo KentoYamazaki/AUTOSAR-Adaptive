@@ -192,6 +192,19 @@ If Transforma- tionPropsToServiceInterfaceElementMapping.transformationProps. si
 * uint32 if sizeOfArrayLengthField equals 4
 」  
 
+この属性は、メモリアライメントを定義します。 SOME / IPネットワークバインディングは、パラメータを自動的に整列させようとはしませんが、指定されたとおりに整列します。現在、コードジェネレーターを簡素化するために、アライメントは1バイトの倍数に制限されています。  
+SOME / IPペイロードが適切に整列されるように、SOME/IPペイロードをメモリに配置する必要があります。インフォテインメントECUの場合、8バイト（つまり64ビット）のアラインメントを達成する必要があります。すべてのECUの場合、少なくとも4バイトのアラインメントを達成する必要があります。効率的な調整は、ハードウェアに大きく依存します。  
+[SWS_CM_10016] Deserializing of exceeded unexpected data   
+「  
+予想よりも多くのデータが逆シリアル化される場合、予期しないデータは破棄されます。既知の分数を考慮する必要があります。
+」  
+
+##### 7.8.1.8.1 Basic Data Types
+[SWS_CM_10036] Serialization of supported StdCppImplementationDataTypes  
+「  
+シリアル化でサポートされる[13]で定義されているプリミティブStdCppImplementationDataTypesを表7.1に示します。
+」  
+
 ##### 7.8.1.8.8 Associative Maps
 連想マップは、マニフェストのカテゴリASSOCIATIVE_MAPを持つStdCppImplementationDataTypeとしてモデル化されます。 AUTOSARマニフェスト仕様[6]で述べられているように、連想マップのC++での「自然な」言語バインディングはara:: core：-：Map <key_type、value_type>です。ここでkey_typeは、 map要素とvalue_typeは、マップ要素の値のデータ型です。これにより、key_typeとvalue_typeは、連想マップCpp実装データ型によって集約された定義済みのCppTemplate引数から派生します。詳細については、[SWS_LBAP_00023]を参照してください。  
 [SWS_CM_00264] Setting the size of the length field for associative maps  
@@ -824,7 +837,7 @@ Communication Managementは、イベントクラスの一部としてGetFreeSamp
 「  
 * パラメータmaxSampleCountをNに設定してSubscribeを呼び出した後、同じEventクラスインスタンスでGetNewSamplesを呼び出す前に、GetFreeSampleCountを呼び出すとNが返されます。
 * 同じイベントクラスインスタンスでのGetNewSamplesの呼び出しのコンテキストでCommunicationMiddlewareによって作成された各SamplePtrは、空きサンプルの数の減少につながります。
-* 
+* このイベントクラスインスタンスから作成されたSamplePtrインスタンスの各破棄またはstd::nullptr_t割り当て（[SWS_CM_00306]を参照）により、空きサンプルの数が増加します。
  」  
 
 [SWS_CM_00027]{DRAFT} Re-entrancy and thread-safety - GetFreeSample- Count
