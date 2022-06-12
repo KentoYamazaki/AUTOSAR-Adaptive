@@ -271,7 +271,17 @@ The BOM shall be added by the SOME/IP sending network binding implementation.
 The serialization of multidimensional arrays shall happen in depth-first order.
 」  
 ![](./image/Figure7_32.png)
+In case of multi-dimensional dynamic length arrays, each array (serialized as SOME/IP array) needs to have its own length field. See L_1 and L_2 in Figure 7.32.  
 
+##### 7.8.1.8.7 Vectors and arrays
+SOME / IPは静的および動的な長さの配列をサポートしますが、この抽象化レベルでのベクトルの定義はありません。したがって、ベクトルは動的な長さの配列にマップされます。 SOME / IP仕様では、動的長さのデータ構造の前に8、16、または32ビットの長さフィールドを追加する必要があります。配列の長さフィールドは、合計バイト数を表します。このセクションでは、ベクトルの実現にも使用できる配列という用語のみを使用していることに注意してください。  
+[SWS_CM_10076] Serializing arrays  
+「  
+配列は、次の要素の連結としてシリアル化されます。:  
+* 次の配列の長さ（バイト単位）を保持する長さインジケーター
+* 配列のシリアル化された要素を含む配列
+ここで、長さフィールドのサイズは、配列に適用されるApSomeipTransformationProps.sizeOfArrayLengthFieldで指定されたとおりに決定されます。
+」  
 
 ##### 7.8.1.8.8 Associative Maps
 連想マップは、マニフェストのカテゴリASSOCIATIVE_MAPを持つStdCppImplementationDataTypeとしてモデル化されます。 AUTOSARマニフェスト仕様[6]で述べられているように、連想マップのC++での「自然な」言語バインディングはara:: core：-：Map <key_type、value_type>です。ここでkey_typeは、 map要素とvalue_typeは、マップ要素の値のデータ型です。これにより、key_typeとvalue_typeは、連想マップCpp実装データ型によって集約された定義済みのCppTemplate引数から派生します。詳細については、[SWS_LBAP_00023]を参照してください。  
@@ -284,6 +294,13 @@ If at- tribute TransformationPropsToServiceInterfaceElementMapping.trans- format
 * uint16 if sizeOfArrayLengthField equals 2 
 * uint32 if sizeOfArrayLengthField equals 4
 」
+
+##### 7.8.1.8.9 Variants
+バリアント（タイプセーフユニオン）には、さまざまなタイプの要素を含めることができます。たとえば、タイプuint8およびタイプuint16のバリアントを定義する場合、バリアントはuint8またはuint16の要素を保持する必要があります。異なるタイプの要素を使用する場合、後続のパラメーターの配置が歪む可能性があります。これを解決するには、パディングが必要になる場合があります。  
+[SWS_CM_10088] Serialization layout of Variants  
+「  
+バリアントのデフォルトのシリアル化レイアウトは、表7.3に示すSOME/IPのユニオンデータ型によって指定されます。
+」  
 
 ##### 7.8.3.3 Handling Events
 [SWS_CM_11024] Mapping of GetFreeSampleCount method  
