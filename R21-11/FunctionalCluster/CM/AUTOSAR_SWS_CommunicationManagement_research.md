@@ -202,8 +202,11 @@ SOME / IPペイロードが適切に整列されるように、SOME/IPペイロ�
 ##### 7.8.1.8.1 Basic Data Types
 [SWS_CM_10036] Serialization of supported StdCppImplementationDataTypes  
 「  
-シリアル化でサポートされる[13]で定義されているプリミティブStdCppImplementationDataTypesを表7.1に示します。
+シリアル化でサポートされる[13]で定義されているプリミティブStdCppImplementationDataTypesを表7.1に示します。  
+![](./image/Table7_1.png)  
 」  
+バイトオーダーは、ApSomeipTransformationPropsのbyteOrderによってすべてのパラメーターに共通に指定されます。  
+
 
 ##### 7.8.1.8.8 Associative Maps
 連想マップは、マニフェストのカテゴリASSOCIATIVE_MAPを持つStdCppImplementationDataTypeとしてモデル化されます。 AUTOSARマニフェスト仕様[6]で述べられているように、連想マップのC++での「自然な」言語バインディングはara:: core：-：Map <key_type、value_type>です。ここでkey_typeは、 map要素とvalue_typeは、マップ要素の値のデータ型です。これにより、key_typeとvalue_typeは、連想マップCpp実装データ型によって集約された定義済みのCppTemplate引数から派生します。詳細については、[SWS_LBAP_00023]を参照してください。  
@@ -864,3 +867,6 @@ Communication Managementは、イベントクラスの一部としてGetFreeSamp
  返されるsize_tは、GetNewTriggersへの最後の呼び出し以降に発生したトリガーの数を示します（ゼロ値は、新しいトリガーが受信されていないことを意味します）。
  」  
  
+## A Mentioned Class Tables
+![](./image/TableA_123.png)  
+このメタクラスは、C++標準ライブラリ機能にバインドするC++言語の基礎となるデータ型定義を指定する方法を表します。  
