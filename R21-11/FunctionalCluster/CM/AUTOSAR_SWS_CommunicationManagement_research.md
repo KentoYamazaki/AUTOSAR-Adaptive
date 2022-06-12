@@ -301,6 +301,11 @@ If at- tribute TransformationPropsToServiceInterfaceElementMapping.trans- format
 「  
 バリアントのデフォルトのシリアル化レイアウトは、表7.3に示すSOME/IPのユニオンデータ型によって指定されます。
 」  
+![](./image/Table7_3.png)
+
+SOME / IPでは、ユニオン（バリアント）の前に8、16、または32ビットの長さフィールドを追加できます。ユニオンの長さフィールド（Variant）は、ユニオンのバイト数（Variant）を表します。
+これにより、逆シリアル化ネットワークバインディングは、ユニオン（バリアント）の後のデータがシリアル化されたデータストリームで開始する位置をすばやく計算できます。これは、ユニオン（Variant）に予想よりも大きいデータが含まれている場合、たとえば、構造体が新しいメンバーを追加して拡張され、最初の「古い」メンバーのみがSOME/IPネットワークバインディングによって逆シリアル化される場合に必要になります。  
+
 
 ##### 7.8.3.3 Handling Events
 [SWS_CM_11024] Mapping of GetFreeSampleCount method  
