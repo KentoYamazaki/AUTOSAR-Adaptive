@@ -270,6 +270,7 @@ The BOM shall be added by the SOME/IP sending network binding implementation.
 「  
 The serialization of multidimensional arrays shall happen in depth-first order.
 」  
+![](./image/Figure7_32.png)
 
 
 ##### 7.8.1.8.8 Associative Maps
