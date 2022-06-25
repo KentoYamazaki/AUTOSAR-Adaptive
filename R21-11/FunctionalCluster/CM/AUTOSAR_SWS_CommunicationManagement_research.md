@@ -341,7 +341,8 @@ typeフィールドは、要素のタイプを記述します。タイプフィ�
 
 ###### 7.8.1.8.9.1 Example: Variant of uint8/uint16 both padded to 32 bit
 この例では、長さフィールドの長さは32ビットとして指定されています。バリアントは、要素としてuint8とuint16をサポートする必要があります。両方とも32ビット境界（長さ= 4バイト）に埋め込まれます。  
-A uint8 will be serialized like this:  
+![](./image/Figure7-8-1-9-1_1.png)  
+
 
 
 ##### 7.8.3.3 Handling Events
